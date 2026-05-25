@@ -1,0 +1,49 @@
+# Rust / Cargo
+src-tauri/target/
+src-tauri/Cargo.lock
+**/*.rs.bk
+**/*.pdb
+
+# Tauri generated
+src-tauri/gen/schemas/
+src-tauri/WixTools/
+src-tauri/.tauri/
+
+# Build artifacts
+pkg/
+build/
+dist/
+out/
+
+# Arch makepkg
+*.pkg.tar.zst
+*.pkg.tar.xz
+*.pkg.tar.gz
+*.src.tar.gz
+*.log
+src-tauri/Cargo.lock
+
+# Node (if added)
+node_modules/
+.pnp.*
+.yarn/
+
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+*~
+
+# Env / local
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

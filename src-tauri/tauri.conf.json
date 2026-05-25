@@ -1,0 +1,47 @@
+{
+  "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/crates/tauri-cli/schema.json",
+  "identifier": "com.bookos.voicerecorder",
+  "productName": "Bookos Voice Recorder",
+  "mainBinaryName": "bookos-voicerecorder",
+  "version": "0.1.0",
+  "build": {
+    "beforeDevCommand": "",
+    "beforeBuildCommand": "",
+    "frontendDist": "../src"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "security": {
+      "csp": "default-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: blob:; media-src 'self' blob: data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src ipc: http://ipc.localhost"
+    },
+    "windows": [
+      {
+        "label": "main",
+        "title": "Grabador de voz",
+        "width": 880,
+        "height": 600,
+        "minWidth": 560,
+        "minHeight": 440,
+        "decorations": false,
+        "transparent": false,
+        "resizable": true,
+        "visible": false
+      }
+    ]
+  },
+  "bundle": {
+    "active": true,
+    "icon": ["icons/icon.png"],
+    "targets": ["deb", "rpm"],
+    "publisher": "BookOS",
+    "category": "Utility",
+    "linux": {
+      "deb": {
+        "depends": ["libwebkit2gtk-4.1-0", "libgtk-3-0"]
+      },
+      "rpm": {
+        "depends": ["webkit2gtk4.1", "gtk3"]
+      }
+    }
+  }
+}

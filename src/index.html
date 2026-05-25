@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">
+<link rel="stylesheet" href="style.css">
+<title>Grabador de voz</title>
+</head>
+<body>
+<div class="main-container windowed" id="mc">
+
+  <div class="titlebar" data-tauri-drag-region>
+    <div class="tb-left">
+      <span class="tb-title" id="tb-title" data-i18n="app.title">Grabador de voz</span>
+    </div>
+    <div class="tb-center"></div>
+    <div class="tb-right">
+      <button id="open-folder-btn" class="tb-icon-btn" data-i18n-title="tb.folder" title="Abrir carpeta de grabaciones" aria-label="Carpeta">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      </button>
+      <button id="library-btn" class="tb-icon-btn active" data-i18n-title="tb.library" title="Grabaciones" aria-label="Grabaciones">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+      <button id="settings-btn" class="tb-icon-btn" data-i18n-title="tb.settings" title="Ajustes" aria-label="Ajustes">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+      <button id="fullscreen-btn" class="tb-icon-btn" data-i18n-title="tb.fullscreen" title="Pantalla completa (F11)" aria-label="Pantalla completa">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+      </button>
+      <button id="theme-btn" class="tb-icon-btn" data-i18n-title="tb.theme" title="Tema" aria-label="Cambiar tema">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      </button>
+      <div class="controls">
+        <button id="minimize" data-i18n-title="wm.minimize" title="Minimizar">─</button>
+        <button id="maximize" data-i18n-title="wm.maximize" title="Maximizar">☐</button>
+        <button id="close" data-i18n-title="wm.close" title="Cerrar">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-wrap" id="page-wrap">
+
+    <!-- ============== PAGE: RECORDER ============== -->
+    <div class="page page-rec" id="page-rec">
+      <div class="rec-layout">
+
+        <aside class="rec-sidebar" id="rec-sidebar">
+          <div class="sb-head">
+            <div class="sb-title" data-i18n="sb.title">Grabaciones</div>
+            <div class="sb-count" id="sb-count">0</div>
+          </div>
+          <div class="sb-search-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input type="text" id="sb-search" class="sb-search" data-i18n-ph="sb.search" placeholder="Buscar nombre o #tag…" spellcheck="false">
+          </div>
+          <div class="sb-filters">
+            <button class="sb-fchip on" data-filter="all" data-i18n="sb.all">Todas</button>
+            <button class="sb-fchip" data-filter="fav"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15 9 22 9.5 17 14.5 18.5 22 12 18 5.5 22 7 14.5 2 9.5 9 9 12 2"/></svg><span data-i18n="sb.fav">Favoritas</span></button>
+          </div>
+          <div class="sb-list" id="sb-list">
+            <div class="sb-empty" id="sb-empty">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+              <div data-i18n="sb.empty.t">Sin grabaciones</div>
+              <div class="sb-empty-hint" data-i18n="sb.empty.h">Pulsa el botón rojo para empezar</div>
+            </div>
+          </div>
+        </aside>
+
+        <main class="rec-main">
+
+          <div class="rec-card" id="rec-card">
+
+            <div class="rec-header">
+              <div class="rec-state-pill" id="rec-state-pill">
+                <span class="dot"></span>
+                <span id="rec-state-text" data-i18n="rec.idle">Listo para grabar</span>
+              </div>
+              <div class="rec-mic-pick" data-i18n-title="rec.mic" title="Dispositivo de entrada">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+                <select id="mic-select"></select>
+                <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+            </div>
+
+            <div class="rec-time" id="rec-time">
+              <span class="t-mm">00</span><span class="t-sep">:</span><span class="t-ss">00</span><span class="t-ms">.00</span>
+            </div>
+
+            <div class="rec-wave-wrap">
+              <canvas id="wave" class="rec-wave"></canvas>
+            </div>
+
+            <div class="rec-controls">
+              <button id="btn-cancel" class="rc-btn rc-side" data-i18n-title="rec.cancel" title="Descartar" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+              </button>
+              <button id="btn-rec" class="rc-btn rc-main" data-i18n-title="rec.rec" title="Grabar (Espacio)">
+                <span class="rc-ring"></span>
+                <span class="rc-glyph rc-glyph-rec"></span>
+              </button>
+              <button id="btn-pause" class="rc-btn rc-side" data-i18n-title="rec.pause" title="Pausar" disabled>
+                <svg viewBox="0 0 24 24" fill="currentColor"><rect x="7" y="5" width="3.5" height="14" rx="1"/><rect x="13.5" y="5" width="3.5" height="14" rx="1"/></svg>
+              </button>
+            </div>
+
+            <div class="rec-hint" id="rec-hint" data-i18n-html="rec.hintIdle">Pulsa el botón o <kbd>Espacio</kbd> para empezar</div>
+          </div>
+
+          <!-- Player panel (visible when item selected) -->
+          <div class="player-card hidden" id="player-card">
+            <div class="pl-head">
+              <div class="pl-title-wrap">
+                <input type="text" id="pl-title" class="pl-title" spellcheck="false">
+                <div class="pl-meta" id="pl-meta">—</div>
+              </div>
+              <div class="pl-actions">
+                <button id="pl-fav" class="pl-iconbtn pl-fav" data-i18n-title="pl.fav" title="Marcar como favorito">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 9 22 9.5 17 14.5 18.5 22 12 18 5.5 22 7 14.5 2 9.5 9 9 12 2"/></svg>
+                </button>
+                <button id="pl-export" class="pl-iconbtn" data-i18n-title="pl.export" title="Exportar">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </button>
+                <button id="pl-reveal" class="pl-iconbtn" data-i18n-title="pl.reveal" title="Mostrar en archivos">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                </button>
+                <button id="pl-delete" class="pl-iconbtn pl-danger" data-i18n-title="pl.delete" title="Eliminar">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="pl-bar">
+              <button id="pl-back" class="pl-step" data-i18n-title="pl.back" title="Atrás 5s (←)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+                <span class="pl-step-n">5</span>
+              </button>
+              <button id="pl-play" class="pl-play" data-i18n-title="pl.play" title="Reproducir (Espacio)">
+                <svg viewBox="0 0 24 24" fill="currentColor" id="pl-play-icon"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+              </button>
+              <button id="pl-fwd" class="pl-step" data-i18n-title="pl.fwd" title="Avanzar 5s (→)">
+                <span class="pl-step-n">5</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+              </button>
+              <div class="pl-track" id="pl-track">
+                <div class="pl-track-fill" id="pl-track-fill"></div>
+                <div class="pl-track-knob" id="pl-track-knob"></div>
+              </div>
+              <div class="pl-time" id="pl-time">0:00 / 0:00</div>
+            </div>
+            <div class="pl-extra">
+              <button id="pl-loop" class="pl-chip" data-i18n-title="pl.loop" title="Repetir en bucle (L)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                <span data-i18n="pl.loopLabel">Bucle</span>
+              </button>
+              <div class="pl-speed">
+                <span data-i18n="pl.speed">Velocidad</span>
+                <div class="seg seg-sm" id="seg-speed">
+                  <button data-v="0.5">0.5×</button><button data-v="1" class="on">1×</button>
+                  <button data-v="1.25">1.25×</button><button data-v="1.5">1.5×</button><button data-v="2">2×</button>
+                </div>
+              </div>
+            </div>
+            <audio id="audio-el" preload="metadata"></audio>
+          </div>
+
+          <!-- Tags card -->
+          <div class="tags-card hidden" id="tags-card">
+            <div class="tc-head">
+              <div class="tc-title" data-i18n="tags.title">Etiquetas</div>
+              <div class="tc-hint" data-i18n="tags.hint">Enter para añadir · click en × para quitar</div>
+            </div>
+            <div class="tc-row">
+              <div class="tag-list" id="tag-list"></div>
+              <input id="tag-input" type="text" class="tag-input" data-i18n-ph="tags.ph" placeholder="Nueva etiqueta…" spellcheck="false">
+            </div>
+          </div>
+
+          <!-- Transcript card -->
+          <div class="trans-card hidden" id="trans-card">
+            <div class="tr-head">
+              <div class="tr-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
+                <span data-i18n="tr.title">Transcripción</span>
+              </div>
+              <div class="tr-actions">
+                <button id="tr-run" class="tr-btn tr-primary" data-i18n-title="tr.run" title="Transcribir">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+                  <span data-i18n="tr.run">Transcribir</span>
+                </button>
+                <button id="tr-copy" class="tr-btn" data-i18n-title="tr.copy" title="Copiar">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </div>
+            </div>
+            <textarea id="tr-text" class="tr-text" data-i18n-ph="tr.ph" placeholder="Aún sin transcribir. Pulsa Transcribir." spellcheck="false"></textarea>
+            <div class="tr-foot" id="tr-foot">Motor: — · Idioma: auto</div>
+          </div>
+
+        </main>
+      </div>
+    </div>
+
+    <!-- ============== PAGE: SETTINGS ============== -->
+    <div class="page page-settings hidden" id="page-settings">
+      <div class="settings-frame">
+        <h2 class="page-title" data-i18n="settings">Ajustes</h2>
+
+        <div class="section-header" data-i18n="sec.appearance">Apariencia</div>
+        <div class="detail-card">
+          <div class="detail-item detail-item-row">
+            <div class="detail-texts"><div class="dt" data-i18n="theme">Tema</div><div class="ds" data-i18n="theme.ds">Sigue al sistema cuando es Automático</div></div>
+            <div class="seg" id="seg-theme" data-key="theme">
+              <button data-v="auto" data-i18n="theme.auto">Auto</button><button data-v="light" data-i18n="theme.light">Claro</button><button data-v="dark" data-i18n="theme.dark">Oscuro</button>
+            </div>
+          </div>
+          <div class="detail-item detail-item-row">
+            <div class="detail-texts"><div class="dt" data-i18n="ui.lang">Idioma de la interfaz</div><div class="ds" data-i18n="ui.lang.ds">Cambia el idioma de toda la aplicación</div></div>
+            <select id="ui-lang" class="mini-select">
+              <option value="auto">Auto</option>
+              <option value="es">Español</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section-header" data-i18n="sec.rec">Grabación</div>
+        <div class="detail-card">
+          <div class="detail-item detail-item-row">
+            <div class="detail-texts"><div class="dt" data-i18n="rec.quality">Calidad</div><div class="ds" data-i18n="rec.quality.ds">Bitrate de codificación Opus</div></div>
+            <div class="seg" id="seg-quality" data-key="quality">
+              <button data-v="low">64k</button><button data-v="mid">96k</button><button data-v="high">128k</button>
+            </div>
+          </div>
+          <div class="detail-item detail-item-row">
+            <div class="detail-texts"><div class="dt" data-i18n="rec.autosave">Auto-guardar al detener</div><div class="ds" data-i18n="rec.autosave.ds">Guarda directamente sin pedir nombre</div></div>
+            <div class="toggle-switch" id="tg-autosave" role="switch" tabindex="0"></div>
+          </div>
+          <div class="detail-item detail-item-row">
+            <div class="detail-texts"><div class="dt" data-i18n="rec.countdown">Cuenta atrás antes de grabar</div><div class="ds" data-i18n="rec.countdown.ds">3·2·1 antes de empezar</div></div>
+            <div class="toggle-switch" id="tg-countdown" role="switch" tabindex="0"></div>
+          </div>
+        </div>
+
+        <div class="section-header" data-i18n="sec.trans">Transcripción</div>
+        <div class="detail-card">
+          <div class="detail-item detail-item-row">
+            <div class="detail-texts"><div class="dt" data-i18n="trans.engine">Motor</div><div class="ds" id="ts-engine-ds" data-i18n="trans.engine.detecting">Detectando…</div></div>
+            <select id="ts-engine" class="mini-select"></select>
+          </div>
+          <div class="detail-item detail-item-row clickable" id="ts-model-row">
+            <div class="detail-texts"><div class="dt"><span data-i18n="trans.model">Modelo</span> <span class="opt-tag" data-i18n="optional">opcional</span></div><div class="ds" id="ts-model-ds" data-i18n="trans.model.none">No seleccionado · usa el por defecto del motor</div></div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="detail-item detail-item-row clickable" id="ts-model-clear" style="display:none">
+            <div class="detail-texts"><div class="dt" style="color:var(--red)" data-i18n="trans.model.clear">Quitar modelo</div><div class="ds" data-i18n="trans.model.clear.ds">Vuelve a usar el por defecto</div></div>
+          </div>
+          <div class="detail-item detail-item-row">
+            <div class="detail-texts"><div class="dt" data-i18n="trans.lang">Idioma del audio</div><div class="ds" data-i18n="trans.lang.ds">Idioma esperado de las grabaciones</div></div>
+            <select id="ts-lang" class="mini-select">
+              <option value="auto">Auto</option>
+              <option value="es">Español</option>
+              <option value="en">English</option>
+              <option value="fr">Français</option>
+              <option value="de">Deutsch</option>
+              <option value="it">Italiano</option>
+              <option value="pt">Português</option>
+              <option value="ca">Català</option>
+              <option value="ja">日本語</option>
+              <option value="zh">中文</option>
+              <option value="ru">Русский</option>
+              <option value="ar">العربية</option>
+            </select>
+          </div>
+          <div class="detail-item">
+            <div class="ds" data-i18n-html="trans.help" style="white-space:normal;line-height:1.5">Whisper: <code>pacman -S whisper.cpp</code> y descarga modelo .bin de <code>ggml-*</code>. Vosk: <code>pip install vosk</code> + modelo. Necesita <code>ffmpeg</code>.</div>
+          </div>
+        </div>
+
+        <div class="section-header" data-i18n="sec.storage">Almacenamiento</div>
+        <div class="detail-card">
+          <div class="detail-item detail-item-row clickable" id="open-folder-row">
+            <div class="detail-texts">
+              <div class="dt" data-i18n="storage.folder">Carpeta de grabaciones</div>
+              <div class="ds" id="rec-dir-path">—</div>
+            </div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+
+        <div class="section-header" data-i18n="sec.about">Acerca de</div>
+        <div class="detail-card">
+          <div class="detail-item detail-item-row">
+            <div class="detail-texts"><div class="dt">Bookos Voice Recorder</div><div class="ds" data-i18n="about.ds">Versión 0.1.0 · BookOS</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Save dialog -->
+<div class="modal-backdrop hidden" id="save-modal">
+  <div class="modal-card">
+    <div class="modal-title" data-i18n="save.title">Guardar grabación</div>
+    <div class="modal-sub" id="save-modal-sub">Duración 0:00</div>
+    <input type="text" id="save-name" class="modal-input" data-i18n-ph="save.ph" placeholder="Nombre de la grabación" spellcheck="false">
+    <div class="modal-row">
+      <button class="modal-btn" id="save-cancel" data-i18n="save.discard">Descartar</button>
+      <button class="modal-btn modal-primary" id="save-confirm" data-i18n="save.save">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Countdown overlay -->
+<div class="countdown-overlay hidden" id="countdown-overlay">
+  <div class="countdown-num" id="countdown-num">3</div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="main.js"></script>
+</body>
+</html>

@@ -424,14 +424,23 @@ function roundRect(c, x, y, w, h, r) {
   c.closePath();
 }
 
+// En reposo NO redibuja a 60 fps (CPU/batería tirada en una app parada):
+// pinta la onda plana una vez y re-comprueba cada 500 ms por si empezó a
+// grabar. El buffer del analizador se reutiliza (sin asignar uno por frame).
+let _waveBuf = null;
 function waveLoop() {
-  if (!state.analyser) { drawWave(0); state.rafId = requestAnimationFrame(waveLoop); return; }
+  if (!state.analyser) {
+    drawWave(0);
+    state.rafId = null;
+    setTimeout(() => { if (!state.rafId) state.rafId = requestAnimationFrame(waveLoop); }, 500);
+    return;
+  }
   const a = state.analyser;
-  const buf = new Uint8Array(a.fftSize);
-  a.getByteTimeDomainData(buf);
+  if (!_waveBuf || _waveBuf.length !== a.fftSize) _waveBuf = new Uint8Array(a.fftSize);
+  a.getByteTimeDomainData(_waveBuf);
   let sum = 0;
-  for (let i = 0; i < buf.length; i++) { const v = (buf[i] - 128) / 128; sum += v * v; }
-  const rms = Math.sqrt(sum / buf.length);
+  for (let i = 0; i < _waveBuf.length; i++) { const v = (_waveBuf[i] - 128) / 128; sum += v * v; }
+  const rms = Math.sqrt(sum / _waveBuf.length);
   const level = state.paused ? 0.04 : Math.min(1, rms * 2.4);
   drawWave(level);
   state.rafId = requestAnimationFrame(waveLoop);

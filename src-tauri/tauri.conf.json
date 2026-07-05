@@ -3,7 +3,7 @@
   "identifier": "com.bookos.voicerecorder",
   "productName": "Bookos Voice Recorder",
   "mainBinaryName": "bookos-voicerecorder",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "build": {
     "beforeDevCommand": "",
     "beforeBuildCommand": "",

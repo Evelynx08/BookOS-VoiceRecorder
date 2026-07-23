@@ -681,7 +681,7 @@ function renderList() {
     e.className = "sb-empty";
     const isEmpty = state.recordings.length === 0;
     e.innerHTML = isEmpty
-      ? `<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><div>${t("sb.empty.t")}</div><div class="sb-empty-hint">${t("sb.empty.h")}</div>`
+      ? `<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z"/></svg><div>${t("sb.empty.t")}</div><div class="sb-empty-hint">${t("sb.empty.h")}</div>`
       : `<div>${t("sb.empty.noMatch")}</div><div class="sb-empty-hint">${t("sb.empty.adjust")}</div>`;
     root.appendChild(e);
     return;
@@ -693,7 +693,7 @@ function renderList() {
     const dateStr = sameDay(date, new Date()) ? "Hoy " + fmtClock(date) : fmtDate(date);
     const tagsHtml = (r.tags || []).slice(0, 3).map(t => `<span class="sb-tag"></span>`).join("");
     it.innerHTML = `
-      ${r.favorite ? '<svg class="sb-fav-star" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15 9 22 9.5 17 14.5 18.5 22 12 18 5.5 22 7 14.5 2 9.5 9 9 12 2"/></svg>' : ''}
+      ${r.favorite ? '<svg class="sb-fav-star" viewBox="0 0 24 24" fill="currentColor"><path d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"/></svg>' : ''}
       <div class="sb-item-name"></div>
       <div class="sb-item-meta"><span></span><span>${fmtSize(r.size)}</span></div>
       ${tagsHtml ? `<div class="sb-tags">${tagsHtml}</div>` : ''}`;
@@ -913,8 +913,8 @@ playBtn.onclick = () => {
   if (!audio.src) return;
   if (audio.paused) audio.play(); else audio.pause();
 };
-audio.onplay = () => { playBtn.classList.add("playing"); $("pl-play-icon").outerHTML = '<svg id="pl-play-icon" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>'; };
-audio.onpause = () => { playBtn.classList.remove("playing"); $("pl-play-icon").outerHTML = '<svg id="pl-play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>'; };
+audio.onplay = () => { playBtn.classList.add("playing"); $("pl-play-icon").outerHTML = '<svg id="pl-play-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M6.75 5.25a.75.75 0 0 1 .75-.75H9a.75.75 0 0 1 .75.75v13.5a.75.75 0 0 1-.75.75H7.5a.75.75 0 0 1-.75-.75V5.25Zm7.5 0A.75.75 0 0 1 15 4.5h1.5a.75.75 0 0 1 .75.75v13.5a.75.75 0 0 1-.75.75H15a.75.75 0 0 1-.75-.75V5.25Z"/></svg>'; };
+audio.onpause = () => { playBtn.classList.remove("playing"); $("pl-play-icon").outerHTML = '<svg id="pl-play-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z"/></svg>'; };
 audio.onended = () => { audio.currentTime = 0; updatePlayerTime(); };
 audio.ontimeupdate = updatePlayerTime;
 function updatePlayerTime() {

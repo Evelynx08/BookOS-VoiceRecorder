@@ -43,9 +43,30 @@ fn load_meta_map() -> HashMap<String, RecMetaEntry> {
         .and_then(|s| serde_json::from_str(&s).ok())
         .unwrap_or_default()
 }
+/// Escritura atómica: escribe a un temporal en el mismo directorio, hace fsync
+/// y renombra encima del destino. Evita dejar el archivo truncado/corrupto si
+/// el proceso muere o se corta la corriente a mitad de la escritura.
+fn atomic_write(path: &std::path::Path, bytes: &[u8]) -> Result<(), String> {
+    use std::io::Write;
+    let dir = path.parent().unwrap_or_else(|| std::path::Path::new("."));
+    let fname = path.file_name().map(|s| s.to_string_lossy().to_string()).unwrap_or_else(|| "tmp".into());
+    let tmp = dir.join(format!(".{}.tmp-{}", fname, std::process::id()));
+    {
+        let mut f = fs::File::create(&tmp).map_err(|e| e.to_string())?;
+        f.write_all(bytes).map_err(|e| { let _ = fs::remove_file(&tmp); e.to_string() })?;
+        f.flush().map_err(|e| { let _ = fs::remove_file(&tmp); e.to_string() })?;
+        let _ = f.sync_all();
+    }
+    if let Err(e) = fs::rename(&tmp, path) {
+        let _ = fs::remove_file(&tmp);
+        return Err(e.to_string());
+    }
+    Ok(())
+}
+
 fn save_meta_map(m: &HashMap<String, RecMetaEntry>) -> Result<(), String> {
     let s = serde_json::to_string_pretty(m).map_err(|e| e.to_string())?;
-    fs::write(meta_path(), s).map_err(|e| e.to_string())
+    atomic_write(&meta_path(), s.as_bytes())
 }
 
 #[tauri::command]
@@ -59,7 +80,7 @@ fn load_state() -> serde_json::Value {
 #[tauri::command]
 fn save_state(state: serde_json::Value) -> Result<(), String> {
     let s = serde_json::to_string_pretty(&state).map_err(|e| e.to_string())?;
-    fs::write(state_path(), s).map_err(|e| e.to_string())
+    atomic_write(&state_path(), s.as_bytes())
 }
 
 #[tauri::command]
@@ -179,13 +200,17 @@ fn save_recording(name: String, ext: String, data_b64: String) -> Result<String,
     while p.exists() {
         p.pop(); p.push(format!("{} ({}).{}", safe_name, i, safe_ext)); i += 1;
     }
-    fs::write(&p, &bytes).map_err(|e| e.to_string())?;
+    atomic_write(&p, &bytes)?;
     Ok(p.to_string_lossy().into_owned())
 }
 
 #[tauri::command]
 fn read_recording_b64(path: String) -> Result<String, String> {
-    let bytes = fs::read(&path).map_err(|e| e.to_string())?;
+    // Solo se permite leer archivos dentro de la carpeta de grabaciones: `path`
+    // viene del frontend y sin esta comprobación sería una lectura arbitraria de
+    // archivos (p. ej. ~/.ssh/id_rsa) si el webview llega a comprometerse.
+    let canon = check_in_recordings(&PathBuf::from(&path))?;
+    let bytes = fs::read(&canon).map_err(|e| e.to_string())?;
     Ok(general_purpose::STANDARD.encode(&bytes))
 }
 
